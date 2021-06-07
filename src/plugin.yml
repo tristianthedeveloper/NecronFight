@@ -1,0 +1,6 @@
+name: NecronFightPlugin
+author: who do you think
+version: 1.0.0
+description: necron fight
+main: com.tristian.necronbossfight.NecronFightPlugin
+depend: [WorldEdit, WorldGuard]
