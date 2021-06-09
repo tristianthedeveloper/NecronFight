@@ -1,10 +1,15 @@
 package com.tristian.necronbossfight.phases.phase_1;
 
+import com.gmail.filoghost.holograms.api.Hologram;
+import com.gmail.filoghost.holograms.api.HolographicDisplaysAPI;
 import com.tristian.necronbossfight.NecronFightPlugin;
 import com.tristian.necronbossfight.mobs.NecronWitherBoss;
+import com.tristian.necronbossfight.utils.TitleAPI;
 import com.tristian.necronbossfight.utils.WorldGuardUtils;
+import net.minecraft.server.v1_7_R4.NBTTagCompound;
 import net.minecraft.server.v1_7_R4.PacketPlayOutEntityDestroy;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EntityType;
@@ -17,6 +22,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 
@@ -59,22 +67,23 @@ public class PhaseOne {
         this.crystalTwo.setMetadata("catacombsEntityType", new FixedMetadataValue(NecronFightPlugin.getInstance(), "energyCrystal"));
 
         Location slimeOne = WorldGuardUtils.getRegionLocation("slime_crystal_power_one", world);
-        Location slimeTwo = WorldGuardUtils.getRegionLocation("slime_crystal_power_one", world);
+        Location slimeTwo = WorldGuardUtils.getRegionLocation("slime_crystal_power_two", world);
 
 
         Slime slimeEntOne = (Slime) world.spawnEntity(slimeOne, EntityType.SLIME);
         Slime slimeEntTwo = (Slime) world.spawnEntity(slimeTwo, EntityType.SLIME);
-        PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(slimeEntOne.getEntityId());
+        slimeEntOne.setSize(5);
+        slimeEntTwo.setSize(5);
 
-        ((CraftPlayer)player).getHandle().playerConnection.sendPacket(packet);
-        packet = new PacketPlayOutEntityDestroy(slimeEntTwo.getEntityId());
-        ((CraftPlayer)player).getHandle().playerConnection.sendPacket(packet);
-        slimeEntOne.setCustomName(ChatColor.translateAlternateColorCodes('&', "&cMissing Energy Crystal &7(Click Here)"));
-        slimeEntTwo.setCustomName(ChatColor.translateAlternateColorCodes('&', "&cMissing Energy Crystal &7(Click Here)"));
+//        yeah get rid of this and fix holograms ape
+        Bukkit.getScheduler().runTaskTimerAsynchronously(NecronFightPlugin.getInstance(), () -> {
+            slimeEntOne.setVelocity(new Vector(0, 0, 0));
 
-        slimeEntOne.setCustomNameVisible(true);
-        slimeEntTwo.setCustomNameVisible(true);
+            slimeEntTwo.setVelocity(new Vector(0, 0, 0));
+        }, 1l, 1L);
 
+        slimeEntOne.setMetadata("catacombsEntityType", new FixedMetadataValue(NecronFightPlugin.getInstance(), "crystalSlime"));
+        slimeEntTwo.setMetadata("catacombsEntityType", new FixedMetadataValue(NecronFightPlugin.getInstance(), "crystalSlime"));
 
 
     }
@@ -87,6 +96,7 @@ public class PhaseOne {
     private static class PhaseOneListener implements Listener {
 
         private PhaseOne parent;
+
         public PhaseOneListener(PhaseOne parent) {
             this.parent = parent;
         }
@@ -102,8 +112,10 @@ public class PhaseOne {
                 return;
             }
             // todo add title and stuff like announcement
-            Player player = (Player)e.getDamager();
-            player.setMetadata("tempItem", new FixedMetadataValue(NecronFightPlugin.getInstance(), player.getInventory().getItem(8).getType() != Material.AIR ? player.getInventory().getItem(8) : new ItemStack(Material.AIR)));
+            Player player = (Player) e.getDamager();
+            player.setMetadata("tempItem", new FixedMetadataValue(NecronFightPlugin.getInstance(), player.getInventory().getItem(8) != null ? player.getInventory().getItem(8) : new ItemStack(Material.AIR)));
+
+
 
             ItemStack energyCrystal = new ItemStack(Material.NETHER_STAR);
             ItemMeta meta = energyCrystal.getItemMeta();
@@ -113,6 +125,7 @@ public class PhaseOne {
             player.getInventory().setItem(8, energyCrystal);
 
         }
+
         // todo move this all into one thing
         @EventHandler
         public void onSlimeShmackWithCrystal(EntityDamageByEntityEvent e) {
@@ -120,7 +133,7 @@ public class PhaseOne {
                 return;
             if (!(e.getEntity().hasMetadata("catacombsEntityType")))
                 return;
-            if (!e.getEntity().getMetadata("catacombsEntityType").get(0).equals("crystalSlime"))
+            if (!e.getEntity().getMetadata("catacombsEntityType").get(0).asString().equals("crystalSlime"))
                 return;
             if (!(e.getDamager() instanceof Player))
                 return;
@@ -129,18 +142,20 @@ public class PhaseOne {
                 return;
 
 
-            p.getInventory().setItem(8, p.hasMetadata("tempItem") ? (ItemStack) (p.getMetadata("tempItem").get(0)) : new ItemStack(Material.AIR)); // get rid of crystal
+            p.getInventory().setItem(8, p.hasMetadata("tempItem") ? (ItemStack) (p.getMetadata("tempItem").get(0)).value() : new ItemStack(Material.AIR)); // get rid of crystal
 
 
             e.setCancelled(true);
-            Location former = e.getEntity().getLocation();
+            Location former = e.getEntity().getLocation().toVector().normalize().toLocation(e.getEntity().getWorld());
+
             e.getEntity().remove();
+
 
             former.getWorld().spawnEntity(former, EntityType.ENDER_CRYSTAL);
 
             parent.crystalsActive++;
-
-
+            TitleAPI.sendTimings(p, 1, 60, 1);
+            TitleAPI.sendSubTitle(p, ChatColor.translateAlternateColorCodes('&', "&a" + p.getName() + " has activated an Energy Crystal! &7(&c" + parent.crystalsActive + " &7/ &c2&7)"), TitleAPI.TitleColor.GREEN);
 
 
         }
@@ -159,7 +174,7 @@ public class PhaseOne {
                 return false;
             if (item.getType() != Material.NETHER_STAR)
                 return false;
-            return !item.getItemMeta().getDisplayName().equals(ChatColor.translateAlternateColorCodes('&', "&cEnergy Crystal"));
+            return item.getItemMeta().getDisplayName().equals(ChatColor.translateAlternateColorCodes('&', "&cEnergy Crystal"));
         }
 
     }

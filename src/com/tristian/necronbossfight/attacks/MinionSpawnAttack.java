@@ -1,6 +1,5 @@
 package com.tristian.necronbossfight.attacks;
 
-import com.sk89q.worldedit.WorldEdit;
 import com.tristian.necronbossfight.NecronFightPlugin;
 import com.tristian.necronbossfight.mobs.NecronWitherBoss;
 import com.tristian.necronbossfight.utils.WorldUtils;
@@ -8,19 +7,13 @@ import net.minecraft.server.v1_7_R4.PacketPlayOutEntityDestroy;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
-import org.bukkit.entity.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Snowball;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 public class MinionSpawnAttack {
 
@@ -65,12 +58,6 @@ public class MinionSpawnAttack {
         }
 
 
-        double radius = ThreadLocalRandom.current().nextInt(2, 5);
-        int points = (int) (ThreadLocalRandom.current().nextInt(1, 4) * radius);
-
-
-        Location origin = head;
-        List<Location> destination = new ArrayList<>();
 
 
     }

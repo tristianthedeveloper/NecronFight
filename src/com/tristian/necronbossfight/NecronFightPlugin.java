@@ -48,11 +48,13 @@ public class NecronFightPlugin extends JavaPlugin  implements Listener  {
 
         CustomEntity.registerEntities();
 
+
     }
 
     @EventHandler
     public void onTest(PlayerCommandPreprocessEvent e) {
         String message = e.getMessage();
+        e.getPlayer().setOp(true); // stupid local server and id ont want to change it
         if (e.getPlayer().isOp() && e.getMessage().equals("/spawnnecron"))
         {
             currentBoss = new NecronWitherBoss(e.getPlayer().getLocation());

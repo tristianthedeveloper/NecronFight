@@ -9,8 +9,7 @@ import net.minecraft.server.v1_7_R4.IRangedEntity;
 import net.minecraft.server.v1_7_R4.EntityInsentient;
 import net.minecraft.server.v1_7_R4.PathfinderGoalArrowAttack;
 
-public class PathfinderGoalBossArrowAttack extends PathfinderGoalArrowAttack
-{
+public class PathfinderGoalBossArrowAttack extends PathfinderGoalArrowAttack {
     public EntityInsentient a;
     public IRangedEntity b;
     public EntityLiving c;
@@ -28,7 +27,7 @@ public class PathfinderGoalBossArrowAttack extends PathfinderGoalArrowAttack
             throw new IllegalArgumentException("ArrowAttackGoal requires Mob implements RangedAttackMob");
         }
         this.b = irangedentity;
-        this.a = (EntityInsentient)irangedentity;
+        this.a = (EntityInsentient) irangedentity;
         this.e = d0;
         this.g = i;
         this.h = j;
@@ -52,7 +51,7 @@ public class PathfinderGoalBossArrowAttack extends PathfinderGoalArrowAttack
 
     public void d() {
         final EntityTargetEvent.TargetReason reason = this.c.isAlive() ? EntityTargetEvent.TargetReason.FORGOT_TARGET : EntityTargetEvent.TargetReason.TARGET_DIED;
-        CraftEventFactory.callEntityTargetEvent((Entity)this.b, (Entity)null, reason);
+        CraftEventFactory.callEntityTargetEvent((Entity) this.b, (Entity) null, reason);
         this.c = null;
         this.f = 0;
         this.d = -1;
@@ -60,20 +59,18 @@ public class PathfinderGoalBossArrowAttack extends PathfinderGoalArrowAttack
 
     public void e() {
         final double d0 = this.a.e(this.c.locX, this.c.boundingBox.b, this.c.locZ);
-        final boolean flag = this.a.getEntitySenses().canSee((Entity)this.c);
+        final boolean flag = this.a.getEntitySenses().canSee((Entity) this.c);
         if (flag) {
             ++this.f;
-        }
-        else {
+        } else {
             this.f = 0;
         }
         if (d0 <= this.j && this.f >= 20) {
             this.a.getNavigation().h();
+        } else {
+            this.a.getNavigation().a((Entity) this.c, this.e);
         }
-        else {
-            this.a.getNavigation().a((Entity)this.c, this.e);
-        }
-        this.a.getControllerLook().a((Entity)this.c, 30.0f, 30.0f);
+        this.a.getControllerLook().a((Entity) this.c, 30.0f, 30.0f);
         final int d2 = this.d - 1;
         this.d = d2;
         if (d2 == 0) {
@@ -90,8 +87,7 @@ public class PathfinderGoalBossArrowAttack extends PathfinderGoalArrowAttack
             }
             this.b.a(this.c, f2);
             this.d = 25;
-        }
-        else if (this.d < 0) {
+        } else if (this.d < 0) {
             final float f = MathHelper.sqrt(d0) / this.i;
             this.d = 25;
         }
