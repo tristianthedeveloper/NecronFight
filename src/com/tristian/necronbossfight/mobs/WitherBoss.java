@@ -2,6 +2,7 @@ package com.tristian.necronbossfight.mobs;
 
 import com.tristian.necronbossfight.NecronFightPlugin;
 import com.tristian.necronbossfight.pathfinding.PathfinderGoalWitherBossArrowAttack;
+import com.tristian.necronbossfight.pathfinding.PathfinderTestingWitherAttack;
 import com.tristian.necronbossfight.utils.ReflectionUtils;
 import net.minecraft.server.v1_7_R4.*;
 
@@ -15,8 +16,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 
-public class WitherBoss extends EntityMonster implements IRangedEntity
-{
+public class WitherBoss extends EntityMonster implements IRangedEntity {
     private float[] bp;
     private float[] bq;
     private float[] br;
@@ -74,8 +74,7 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
         this.lastTargetName = "";
         try {
             this.bw = (IEntitySelector) ReflectionUtils.getObject(EntityWither.class, this, "bw");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             this.bw = null;
         }
@@ -93,15 +92,14 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
     }
 
     public void setBoss(final NecronWitherBoss boss) {
-        if (boss != null) {
+        if (boss == null) {
             this.boss = boss;
             this.bossent = boss.getEntity();
-        }
-        else {
+        } else {
             --this.failedTimes;
         }
         if (boss != null) {
-            this.goalSelector.a(2, new PathfinderGoalWitherBossArrowAttack(this, 1.0, 40, 40, 20.0f));
+            this.goalSelector.a(2, new PathfinderTestingWitherAttack(this, 1.0, 40, 70, 30.0f));
         }
         System.out.println("Given: " + boss);
     }
@@ -117,19 +115,29 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
             this.die();
             return;
         }
-        final double motionMultiplier = 0.6000000238418579;
+        double motionMultiplier = 0.6000000238418579;
         this.motY *= motionMultiplier;
+
         if (!this.world.isStatic && this.t(0) > 0) {
             final Entity entity = this.world.getEntity(this.t(0));
             if (entity != null) {
                 double height = 2.5;
                 if (this.boss != null) {
+                    if (this.boss.isStuck()) {
+                        motionMultiplier = 0.0;
+
+                        this.setPathEntity(null);
+                        this.motX = 0.0;
+                        this.motY = 0.0;
+                        this.motZ = 0.0;
+                        return;
+                    }
                 }
-                if (this.locY < entity.locY || this.locY < entity.locY + height) {
+                if (this.locY < entity.locY) {
                     if (this.motY < 0.0) {
                         this.motY = 0.0;
                     }
-//                    this.motY += (0.5 - this.motY) * (motionMultiplier / 2.0);
+                    this.motY += (0.5 - this.motY) * (motionMultiplier / 2.0);
                 }
                 final double distanceX = entity.locX - this.locX;
                 final double distanceZ = entity.locZ - this.locZ;
@@ -137,7 +145,8 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
                 double distanceFromPlayer = 9.0;
                 double speedMultiplier = 1.0;
                 if (this.boss != null) {
-                    distanceFromPlayer = 12.0;
+                    distanceFromPlayer = boss.phase == 1 ? 9.0 : 7.0;
+//                    this is the big thing lol
                     speedMultiplier = 1.0;
                 }
                 if (distanceSqr > distanceFromPlayer) {
@@ -148,7 +157,7 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
             }
         }
         if (this.motX * this.motX + this.motZ * this.motZ > 0.05000000074505806) {
-            this.yaw = (float)Math.atan2(this.motZ, this.motX) * 57.295776f - 90.0f;
+            this.yaw = (float) Math.atan2(this.motZ, this.motX) * 57.295776f - 90.0f;
         }
         super.e();
         for (int i = 0; i < 2; ++i) {
@@ -169,12 +178,11 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
                 final double d5 = entity2.locY + entity2.getHeadHeight() - distanceSqr;
                 final double d6 = entity2.locZ - distanceSqrRoot;
                 final double d7 = MathHelper.sqrt(d4 * d4 + d6 * d6);
-                final float f = (float)(Math.atan2(d6, d4) * 180.0 / 3.1415927410125732) - 90.0f;
-                final float f2 = (float)(-(Math.atan2(d5, d7) * 180.0 / 3.1415927410125732));
+                final float f = (float) (Math.atan2(d6, d4) * 180.0 / 3.1415927410125732) - 90.0f;
+                final float f2 = (float) (-(Math.atan2(d5, d7) * 180.0 / 3.1415927410125732));
                 this.bp[i] = this.b(this.bp[i], f2, 40.0f);
                 this.bq[i] = this.b(this.bq[i], f, 10.0f);
-            }
-            else {
+            } else {
                 this.bq[i] = this.b(this.bq[i], this.aM, 10.0f);
             }
         }
@@ -208,7 +216,7 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
                 }
                 this.world.createExplosion(this, this.locX, this.locY + this.getHeadHeight(), this.locZ, 7.0f, false, this.world.getGameRules().getBoolean("mobGriefing"));
                 final int viewDistance = this.world.getServer().getViewDistance() * 16;
-                for (final net.minecraft.server.v1_7_R4.EntityPlayer player : Arrays.stream(this.world.players.toArray()).map(e -> (EntityPlayer)e).collect(Collectors.toList())) {
+                for (final net.minecraft.server.v1_7_R4.EntityPlayer player : Arrays.stream(this.world.players.toArray()).map(e -> (EntityPlayer) e).collect(Collectors.toList())) {
 
                     final double deltaX = this.locX - player.locX;
                     final double deltaZ = this.locZ - player.locZ;
@@ -220,10 +228,9 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
                         final double deltaLength = Math.sqrt(distanceSquared);
                         final double relativeX = player.locX + deltaX / deltaLength * viewDistance;
                         final double relativeZ = player.locZ + deltaZ / deltaLength * viewDistance;
-                        player.playerConnection.sendPacket(new PacketPlayOutWorldEvent(1013, (int)relativeX, (int)this.locY, (int)relativeZ, 0, true));
-                    }
-                    else {
-                        player.playerConnection.sendPacket(new PacketPlayOutWorldEvent(1013, (int)this.locX, (int)this.locY, (int)this.locZ, 0, true));
+                        player.playerConnection.sendPacket(new PacketPlayOutWorldEvent(1013, (int) relativeX, (int) this.locY, (int) relativeZ, 0, true));
+                    } else {
+                        player.playerConnection.sendPacket(new PacketPlayOutWorldEvent(1013, (int) this.locX, (int) this.locY, (int) this.locZ, 0, true));
                     }
                 }
             }
@@ -231,8 +238,7 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
             if (this.ticksLived % 10 == 0) {
                 this.heal(10.0f, EntityRegainHealthEvent.RegainReason.WITHER_SPAWN);
             }
-        }
-        else {
+        } else {
             super.bn();
             for (int witherTargetId = 1; witherTargetId < 3; ++witherTargetId) {
                 if (this.ticksLived >= this.nextShot[witherTargetId - 1]) {
@@ -256,25 +262,23 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
                         final Entity entity = this.world.getEntity(target);
                         if (entity instanceof EntityHuman) {
                             if (entity != null && entity.isAlive() && this.f(entity) <= 900.0 && this.hasLineOfSight(entity)) {
-                                this.a(witherTargetId + 1, (EntityLiving)entity);
+                                this.a(witherTargetId + 1, (EntityLiving) entity);
                                 this.nextShot[witherTargetId - 1] = this.ticksLived + 5 + this.random.nextInt(20);
                                 this.shootTimer[witherTargetId - 1] = 0;
-                            }
-                            else {
+                            } else {
                                 this.b(witherTargetId, 0);
                             }
                         }
-                    }
-                    else {
-                        final List<?> list = (List<?>)this.world.a(EntityHuman.class, this.boundingBox.grow(50.0, 8.0, 50.0), (IEntitySelector)ReflectionUtils.getObject(EntityWither.class, this, "bw"));
+                    } else {
+                        final List<?> list = (List<?>) this.world.a(EntityHuman.class, this.boundingBox.grow(50.0, 13.0, 50.0), (IEntitySelector) ReflectionUtils.getObject(EntityWither.class, this, "bw"));
                         int targetsFound = 0;
                         for (int i1 = 0; i1 < 10 && !list.isEmpty(); ++i1) {
-                            final EntityLiving entityliving = (EntityLiving)list.get(this.random.nextInt(list.size()));
-                            if (entityliving != this && entityliving.isAlive() && this.hasLineOfSight(entityliving)) {
+                            final EntityLiving entityliving = (EntityLiving) list.get(this.random.nextInt(list.size()));
+                            if (entityliving != this && entityliving.isAlive()) {
                                 if (!(entityliving instanceof EntityHuman)) {
                                     break;
                                 }
-                                final EntityHuman human = (EntityHuman)entityliving;
+                                final EntityHuman human = (EntityHuman) entityliving;
                                 if (!this.lastTargetName.equals(human.getName())) {
                                     if (!human.abilities.isInvulnerable) {
                                         ++targetsFound;
@@ -282,8 +286,7 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
                                     }
                                     break;
                                 }
-                            }
-                            else {
+                            } else {
                                 list.remove(entityliving);
                             }
                         }
@@ -295,8 +298,7 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
             }
             if (this.getGoalTarget() != null && this.getGoalTarget() instanceof EntityHuman) {
                 this.b(0, this.getGoalTarget().getId());
-            }
-            else {
+            } else {
                 this.b(0, 0);
             }
             if (this.bv > 0) {
@@ -322,7 +324,7 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
                         }
                     }
                     if (flag) {
-                        this.world.a(null, 1012, (int)this.locX, (int)this.locY, (int)this.locZ, 0);
+                        this.world.a(null, 1012, (int) this.locX, (int) this.locY, (int) this.locZ, 0);
                     }
                 }
             }
@@ -382,7 +384,8 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
     }
 
     private void a(final int entityID, final double spawnX, final double spawnY, final double spawnZ, final boolean flag) {
-        this.world.a(null, 1014, (int)this.locX, (int)this.locY, (int)this.locZ, 0);
+
+        this.world.a(null, 1014, (int) this.locX, (int) this.locY, (int) this.locZ, 0);
         final double x = this.u(entityID);
         final double y = this.v(entityID);
         final double z = this.w(entityID);
@@ -393,6 +396,8 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
         entitywitherskull.locY = y;
         entitywitherskull.locX = x;
         entitywitherskull.locZ = z;
+        if (this.boss.isStuck())
+            return;
         this.world.addEntity(entitywitherskull);
     }
 
@@ -411,7 +416,7 @@ public class WitherBoss extends EntityMonster implements IRangedEntity
             return false;
         }
         final Entity entity = damagesource.getEntity();
-        if ((entity != null && !(entity instanceof EntityHuman) && entity instanceof EntityLiving && ((EntityLiving)entity).getMonsterType() == this.getMonsterType()) || entity instanceof EntityWitherSkull) {
+        if ((entity != null && !(entity instanceof EntityHuman) && entity instanceof EntityLiving && ((EntityLiving) entity).getMonsterType() == this.getMonsterType()) || entity instanceof EntityWitherSkull) {
             return false;
         }
         if (this.bv <= 0) {

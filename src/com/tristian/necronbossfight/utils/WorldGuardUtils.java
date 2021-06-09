@@ -25,7 +25,7 @@ public class WorldGuardUtils {
 
     public static Polygonal2DRegion getPoints(String region, World world) {
 
-        com.sk89q.worldedit.world.World jesus = WorldEdit.getInstance().getServer().getWorlds().stream().filter(e -> ((com.sk89q.worldedit.world.World) e).getName().equals(world.getName())).findFirst().get();
+        com.sk89q.worldedit.world.World jesus = WorldEdit.getInstance().getServer().getWorlds().stream().filter(e -> e.getName().equals(world.getName())).findFirst().get();
         ProtectedRegion wgRegion = WorldGuardPlugin.inst().getRegionManager(world).getRegion(region);
         Polygonal2DRegion weRegion = new Polygonal2DRegion(jesus, wgRegion.getPoints(), wgRegion.getMinimumPoint().getBlockY(), wgRegion.getMaximumPoint().getBlockY());
         return weRegion;
@@ -34,5 +34,9 @@ public class WorldGuardUtils {
     public static Location getRegionLocation(String region, World world) {
 //        todo make variable
         return new Location(world, instance.getRegionManager(world).getRegion(region).getMinimumPoint().getX(),  instance.getRegionManager(world).getRegion(region).getMinimumPoint().getY(),  instance.getRegionManager(world).getRegion(region).getMinimumPoint().getZ());
+    }
+
+    public static ProtectedRegion getRegion(String region, World world) {
+        return instance.getRegionManager(world).getRegion(region);
     }
 }
