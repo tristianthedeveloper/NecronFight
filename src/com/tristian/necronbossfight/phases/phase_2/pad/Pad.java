@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public abstract class Pad {
 
-    private static HashMap<String, Pad> pads = new LinkedHashMap<>();
+    public static HashMap<String, Pad> pads = new LinkedHashMap<>();
 
 
     private int lowestBlockPosition;
@@ -31,6 +31,8 @@ public abstract class Pad {
 
     public Pad(String region) {
         this.lowestBlockPosition = 169;
+
+        pads.put(region, this);
 
     }
 
