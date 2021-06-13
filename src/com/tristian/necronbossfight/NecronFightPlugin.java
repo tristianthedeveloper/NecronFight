@@ -8,6 +8,7 @@ import com.tristian.necronbossfight.mobs.NecronWitherBoss;
 import com.tristian.necronbossfight.phases.phase_1.PhaseOne;
 import com.tristian.necronbossfight.phases.phase_2.BatEntityRideable;
 import com.tristian.necronbossfight.phases.phase_2.pad.PadPurple;
+import com.tristian.necronbossfight.phases.phase_2.pad.PadRunnable;
 import com.tristian.necronbossfight.utils.CustomEntity;
 import com.tristian.necronbossfight.utils.WorldGuardUtils;
 import javafx.beans.value.ObservableBooleanValue;
@@ -91,8 +92,11 @@ public class NecronFightPlugin extends JavaPlugin implements Listener {
             new BatEntityRideable().rideBatToPath(new Location(e.getPlayer().getWorld(), 272, 225, 267), new Location(loc.getWorld(), 273, 222, 236), e.getPlayer());
 
         }
-        if (message.equals("/purplepadtest")) {
-            new PadPurple(e.getPlayer().getWorld()).move();
+        if (message.equals("/padtask")) {
+            new PadPurple(e.getPlayer().getWorld());
+
+//            new PadPurple(e.getPlayer().getWorld()).move();
+            Bukkit.getScheduler().runTaskTimer(this, new PadRunnable(e.getPlayer().getWorld()), 0l, 5l);
         }
 
     }

@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class PadRunnable implements Runnable {
 
@@ -16,12 +17,14 @@ public class PadRunnable implements Runnable {
 
     public PadRunnable(World world) {
 
+        this.world = world;
+
     }
 
 
     @Override
     public void run() {
-        Pad detected;
+        AtomicReference<Pad> detected = new AtomicReference<>();
 
 
         List<Player> playersInRegion = new ArrayList<Player>();
@@ -31,15 +34,15 @@ public class PadRunnable implements Runnable {
             for (Player p : NecronFightPlugin.getInstance().getServer().getOnlinePlayers()) {
                 Location loc = p.getLocation();
                 if (region.contains(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())) {
-                    playersInRegion.add(p);
+                    System.out.println("detected");
+                    detected.set(v);
                     break;
                 }
             }
         });
-        if (!(playersInRegion.isEmpty())) {
-
+        if (detected.get() != null) {
+            detected.get().move();
         }
-
 
     }
 }

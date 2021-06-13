@@ -51,6 +51,7 @@ public class PhaseOne extends Phase {
         this.task = Bukkit.getScheduler().runTaskTimerAsynchronously(NecronFightPlugin.getInstance(), new EnergyLaserRunnable(this.boss, this, slimeId), 20L, 20L);
 
 
+
         Bukkit.getPluginManager().registerEvents(new PhaseOneListener(this), NecronFightPlugin.getInstance());
     }
 

@@ -9,6 +9,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.tristian.necronbossfight.NecronFightPlugin;
 import com.tristian.necronbossfight.mobs.NecronWitherBoss;
 import com.tristian.necronbossfight.phases.phase_2.BatEntityRideable;
+import com.tristian.necronbossfight.phases.phase_2.PhaseTwo;
 import com.tristian.necronbossfight.utils.WorldGuardUtils;
 import net.minecraft.server.v1_7_R4.PacketPlayOutEntityDestroy;
 import org.bukkit.Bukkit;
@@ -89,6 +90,7 @@ public class EnergyLaserRunnable implements Runnable {
 //                            todo remove me fat
                             b.remove();
                             this.parent.player.setVelocity(new org.bukkit.util.Vector(0, -0.76, 0));
+                            new PhaseTwo(this.parent.player, boss, this.parent.player.getWorld());
                         }, 2L);
 
                     }, 20L);

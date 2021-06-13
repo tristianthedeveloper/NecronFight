@@ -76,6 +76,7 @@ public class PadPurple extends Pad {
 
                 )
         );
+//        this.currentYPosition = 196;
     }
 
     private Location createLocation(int x, int y, int z, World world) {

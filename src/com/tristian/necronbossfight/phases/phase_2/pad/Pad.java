@@ -18,9 +18,12 @@ public abstract class Pad {
 
     private int lowestBlockPosition;
 
-    private AtomicInteger addWhenUp = new AtomicInteger(0);
 
-    private AtomicInteger moveWhenDown = new AtomicInteger(0);
+    private boolean up = false;
+
+
+    private int addWhenUp = 0;
+    private int moveWhenDown = 0;
 
 
     private String region;
@@ -31,7 +34,6 @@ public abstract class Pad {
 
     public Pad(String region) {
         this.lowestBlockPosition = 169;
-
         pads.put(region, this);
 
     }
@@ -45,40 +47,43 @@ public abstract class Pad {
 
 
     public boolean goUp(Pad pad) {
+        if (this.lowestBlockPosition == 196)
+            up = false;
+        if (this.lowestBlockPosition == 168)
+            up = true;
+        return up;
 //        return false if to go down.
-        return pad.lowestBlockPosition == 169;
     }
 
     public void movePadDown(Pad pad, int amount) {
 
         int temp = lowestBlockPosition;
         int dy = -1;
-        AtomicInteger i = new AtomicInteger(0);
-        Bukkit.getScheduler().runTaskTimer(NecronFightPlugin.getInstance(), () -> {
-            if (i.get() >= amount)
-                return;
-            for (Location l : startLocations) {
-                l.clone().subtract(0, this.moveWhenDown.getAndIncrement(), 0).getBlock().setType(l.getBlock().getType());
-            }
-            i.incrementAndGet();
-            this.lowestBlockPosition--;
-        }, 1, 5L);
+        for (Location l : startLocations) {
+            l.clone().subtract(0, this.moveWhenDown, 0).getBlock().setType(l.getBlock().getType());
+        }
+        this.moveWhenDown++;
+        this.lowestBlockPosition--;
+        this.addWhenUp = 0;
+        Bukkit.broadcastMessage("moving down");
     }
 
     public void movePadUp(int amount) {
-        List<Location> endPositions = this.startLocations.stream().map(e -> e.subtract(0, 27, 0)).collect(Collectors.toList());
+        System.out.println("moving up");
+        List<Location> endPositions = this.startLocations.stream().map(e -> e.clone().subtract(0, (27), 0)).collect(Collectors.toList());
 
-        System.out.println(endPositions);
-        AtomicInteger i = new AtomicInteger(0);
-        Bukkit.getScheduler().runTaskTimer(NecronFightPlugin.getInstance(), () -> {
-            if (i.get() >= amount)
-                return;
-            for (Location l : endPositions) {
-                l.clone().add(0, this.addWhenUp.getAndIncrement(), 0).getBlock().setType(Material.AIR);
-            }
-            i.incrementAndGet();
-            this.lowestBlockPosition++;
-        }, 1, 5L);
+        for (Location l : endPositions) {
+//            l.clone().add(0, this.addWhenUp.get(), 0).getBlock().setType(Material.AIR);
+            l.add(0, Math.abs(this.addWhenUp), 0).getBlock().setType(Material.AIR);
+            System.out.println(l);
+        }
+
+        this.addWhenUp++;
+
+
+        this.lowestBlockPosition++;
+
+        this.moveWhenDown = 0; // make sure nothing bad happens lol
     }
 
     public void move() {
