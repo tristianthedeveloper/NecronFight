@@ -65,7 +65,7 @@ public class NecronWitherBoss {
     //    will be 1 billion later lol
     public double getMaxHealth() {
 
-        return 100;
+        return 500;
 
     }
 
@@ -87,4 +87,13 @@ public class NecronWitherBoss {
     public boolean isStuck() {
         return this.getLivingEntity().hasMetadata("necronStuck");
     }
+
+
+    public void sendMessage(String message) {
+
+        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&4&lNecron: &c" + message));
+
+
+    }
+
 }

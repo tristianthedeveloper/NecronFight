@@ -90,6 +90,10 @@ public class EnergyLaserRunnable implements Runnable {
 //                            todo remove me fat
                             b.remove();
                             this.parent.player.setVelocity(new org.bukkit.util.Vector(0, -0.76, 0));
+
+
+                            this.parent.player.setMetadata("noFallDamageTemp", new FixedMetadataValue(NecronFightPlugin.getInstance(), true));
+
                             new PhaseTwo(this.parent.player, boss, this.parent.player.getWorld());
                         }, 2L);
 

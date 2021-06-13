@@ -1,7 +1,6 @@
 package com.tristian.necronbossfight;
 
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.tristian.necronbossfight.attacks.MinionSpawnAttack;
 import com.tristian.necronbossfight.listeners.SnowballListener;
 import com.tristian.necronbossfight.mobs.NecronWitherBoss;
@@ -11,7 +10,6 @@ import com.tristian.necronbossfight.phases.phase_2.pad.PadPurple;
 import com.tristian.necronbossfight.phases.phase_2.pad.PadRunnable;
 import com.tristian.necronbossfight.utils.CustomEntity;
 import com.tristian.necronbossfight.utils.WorldGuardUtils;
-import javafx.beans.value.ObservableBooleanValue;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -24,7 +22,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -55,6 +52,19 @@ public class NecronFightPlugin extends JavaPlugin implements Listener {
 
 
     }
+
+    @Override
+    public void onDisable() {
+
+
+
+
+
+
+
+
+    }
+
 
     @EventHandler
     public void onTest(PlayerCommandPreprocessEvent e) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoSuchFieldException {
@@ -93,9 +103,6 @@ public class NecronFightPlugin extends JavaPlugin implements Listener {
 
         }
         if (message.equals("/padtask")) {
-            new PadPurple(e.getPlayer().getWorld());
-
-//            new PadPurple(e.getPlayer().getWorld()).move();
             Bukkit.getScheduler().runTaskTimer(this, new PadRunnable(e.getPlayer().getWorld()), 0l, 5l);
         }
 

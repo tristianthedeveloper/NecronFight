@@ -1,14 +1,13 @@
 package com.tristian.necronbossfight.phases.phase_2.pad;
 
-import com.tristian.necronbossfight.NecronFightPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public abstract class Pad {
@@ -26,6 +25,8 @@ public abstract class Pad {
     private int moveWhenDown = 0;
 
 
+
+
     private String region;
 
 
@@ -33,7 +34,8 @@ public abstract class Pad {
     public List<Location> startLocations;
 
     public Pad(String region) {
-        this.lowestBlockPosition = 169;
+        this.lowestBlockPosition = 194;
+        this.up = true;
         pads.put(region, this);
 
     }
@@ -46,25 +48,22 @@ public abstract class Pad {
     ;
 
 
-    public boolean goUp(Pad pad) {
-        if (this.lowestBlockPosition == 196)
-            up = false;
-        if (this.lowestBlockPosition == 168)
-            up = true;
-        return up;
-//        return false if to go down.
-    }
 
-    public void movePadDown(Pad pad, int amount) {
+    public void movePadDown(Pad pad) {
 
         int temp = lowestBlockPosition;
         int dy = -1;
         for (Location l : startLocations) {
             l.clone().subtract(0, this.moveWhenDown, 0).getBlock().setType(l.getBlock().getType());
+            System.out.println(l.getBlock());
         }
+
         this.moveWhenDown++;
+
         this.lowestBlockPosition--;
+
         this.addWhenUp = 0;
+
         Bukkit.broadcastMessage("moving down");
     }
 
@@ -87,10 +86,33 @@ public abstract class Pad {
     }
 
     public void move() {
-        if (goUp(this))
+
+
+
+
+        if (this.lowestBlockPosition == 166)
+            this.up = true;
+        if (this.lowestBlockPosition >= 194)
+            this.up = false;
+
+
+
+
+        if (up)
             movePadUp(1);
-        else movePadDown(this, 1);
+        else movePadDown(this);
+        Bukkit.broadcastMessage("add when up: " + this.addWhenUp);
+        Bukkit.broadcastMessage("sub when down : " + this.moveWhenDown);
+        Bukkit.broadcastMessage("current y pos: " + this.lowestBlockPosition);
     }
 
+
+    public boolean isUp() {
+        return this.up;
+    }
+
+    Location createLocation(int x, int y, int z, World world) {
+        return new Location(world, x, y, z);
+    }
 }
 

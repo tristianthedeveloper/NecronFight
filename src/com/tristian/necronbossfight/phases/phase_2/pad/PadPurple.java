@@ -9,8 +9,6 @@ import java.util.LinkedList;
 public class PadPurple extends Pad {
 
 
-
-
     public PadPurple(World world) {
         super("pad_purple");
 
@@ -69,7 +67,6 @@ public class PadPurple extends Pad {
                         createLocation(302, 196, 266, world),
 
 
-
                         createLocation(297, 196, 263, world),
                         createLocation(297, 196, 264, world),
                         createLocation(297, 196, 265, world)
@@ -79,7 +76,4 @@ public class PadPurple extends Pad {
 //        this.currentYPosition = 196;
     }
 
-    private Location createLocation(int x, int y, int z, World world) {
-        return new Location(world, x, y, z);
-    }
 }
