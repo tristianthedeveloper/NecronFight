@@ -3,6 +3,7 @@ package com.tristian.necronbossfight.phases.phase_2.pad;
 import org.bukkit.World;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -12,6 +13,7 @@ public class PadYellow extends Pad {
 
 
 //        purple locations but with an x-value of (x) -> x + 50
+        this.startLocations = new LinkedList<>();
         this.startLocations.addAll(
                 Stream.of(
 

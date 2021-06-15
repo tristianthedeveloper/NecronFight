@@ -80,6 +80,13 @@ public class EnergyLaserRunnable implements Runnable {
                     b.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 2000, 200));
                     b.setMetadata("NOTARGET", new FixedMetadataValue(NecronFightPlugin.getInstance(), true));
                     b.setVelocity(new org.bukkit.util.Vector(0, 0, -2));
+
+                    this.parent.boss
+                            .getLivingEntity().teleport(dest);
+                    this.parent.boss.getLivingEntity().setVelocity(new org.bukkit.util.Vector(0, -10, 0));
+
+
+
                     Bukkit.getScheduler().runTaskLater(NecronFightPlugin.getInstance(), () -> {
 
                         b.setVelocity(new org.bukkit.util.Vector(0, -10, 0.0));

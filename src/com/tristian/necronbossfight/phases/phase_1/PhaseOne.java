@@ -51,7 +51,6 @@ public class PhaseOne extends Phase {
         this.task = Bukkit.getScheduler().runTaskTimerAsynchronously(NecronFightPlugin.getInstance(), new EnergyLaserRunnable(this.boss, this, slimeId), 20L, 20L);
 
 
-
         Bukkit.getPluginManager().registerEvents(new PhaseOneListener(this), NecronFightPlugin.getInstance());
     }
 
@@ -152,6 +151,9 @@ public class PhaseOne extends Phase {
 
 
             ((CraftPlayer) player).getHandle().playerConnection.sendPacket(hideCrystal);
+
+
+            this.parent.boss.getTargets().forEach(p -> p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a" + player.getName() + " picked up an Energy Crystal!")));
 
 
         }

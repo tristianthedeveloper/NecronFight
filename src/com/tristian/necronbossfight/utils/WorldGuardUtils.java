@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,20 @@ public class WorldGuardUtils {
 //        todo make variable
         return new Location(world, instance.getRegionManager(world).getRegion(region).getMinimumPoint().getX(),  instance.getRegionManager(world).getRegion(region).getMinimumPoint().getY(),  instance.getRegionManager(world).getRegion(region).getMinimumPoint().getZ());
     }
+
+
+    public static boolean isInside(String region, World world, Location loc) {
+        ProtectedRegion wgRegion = instance.getRegionManager(world).getRegion(region);
+        return wgRegion.contains(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+    }
+
+    public static LinkedList<ProtectedRegion> applicableRegions(Location loc) {
+        LinkedList<ProtectedRegion> regs = new LinkedList<>();
+        instance.getRegionManager(loc.getWorld()).getApplicableRegions(loc).forEach(regs::add);
+        return regs.size() == 0 ? null : regs;
+    }
+
+
 
     public static ProtectedRegion getRegion(String region, World world) {
         return instance.getRegionManager(world).getRegion(region);

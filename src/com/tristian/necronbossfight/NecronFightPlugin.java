@@ -6,6 +6,7 @@ import com.tristian.necronbossfight.listeners.SnowballListener;
 import com.tristian.necronbossfight.mobs.NecronWitherBoss;
 import com.tristian.necronbossfight.phases.phase_1.PhaseOne;
 import com.tristian.necronbossfight.phases.phase_2.BatEntityRideable;
+import com.tristian.necronbossfight.phases.phase_2.PhaseTwo;
 import com.tristian.necronbossfight.phases.phase_2.pad.PadPurple;
 import com.tristian.necronbossfight.phases.phase_2.pad.PadRunnable;
 import com.tristian.necronbossfight.utils.CustomEntity;
@@ -14,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -103,7 +105,10 @@ public class NecronFightPlugin extends JavaPlugin implements Listener {
 
         }
         if (message.equals("/padtask")) {
-            Bukkit.getScheduler().runTaskTimer(this, new PadRunnable(e.getPlayer().getWorld()), 0l, 5l);
+//            Bukkit.getScheduler().runTaskTimer(this, new PadRunnable(e.getPlayer().getWorld()), 0l, 5l);
+        }
+        if (message.equals("/forcephasetwo")) {
+            new PhaseTwo(e.getPlayer(), this.currentBoss, e.getPlayer().getWorld());
         }
 
     }

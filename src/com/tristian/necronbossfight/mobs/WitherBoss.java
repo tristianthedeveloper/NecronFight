@@ -4,12 +4,14 @@ import com.tristian.necronbossfight.NecronFightPlugin;
 import com.tristian.necronbossfight.pathfinding.PathfinderGoalWitherBossArrowAttack;
 import com.tristian.necronbossfight.pathfinding.PathfinderTestingWitherAttack;
 import com.tristian.necronbossfight.utils.ReflectionUtils;
+import com.tristian.necronbossfight.utils.WorldGuardUtils;
 import net.minecraft.server.v1_7_R4.*;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_7_R4.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -303,28 +305,42 @@ public class WitherBoss extends EntityMonster implements IRangedEntity {
             }
             if (this.bv > 0) {
                 --this.bv;
-                if (this.bv == 0 && this.world.getGameRules().getBoolean("mobGriefing")) {
-                    final int witherTargetId = MathHelper.floor(this.locY);
-                    final int target = MathHelper.floor(this.locX);
-                    final int j1 = MathHelper.floor(this.locZ);
-                    boolean flag = false;
-                    for (int k1 = -1; k1 <= 1; ++k1) {
-                        for (int l1 = -1; l1 <= 1; ++l1) {
-                            for (int i2 = 0; i2 <= 3; ++i2) {
-                                final int j2 = target + k1;
-                                final int k2 = witherTargetId + i2;
-                                final int l2 = j1 + l1;
-                                final Block block = this.world.getType(j2, k2, l2);
-                                if (block.getMaterial() != Material.AIR && block != Blocks.BEDROCK && block != Blocks.ENDER_PORTAL && block != Blocks.ENDER_PORTAL_FRAME && block != Blocks.COMMAND) {
-                                    if (!CraftEventFactory.callEntityChangeBlockEvent(this, j2, k2, l2, Blocks.AIR, 0).isCancelled()) {
-                                        flag = (this.world.setAir(j2, k2, l2, true) || flag);
+                boolean test = true;
+                boolean griefing = this.world
+                        .getGameRules().getBoolean("mobGriefing");
+                System.out.println("this.bv > 0");
+                if (this.bv == 0 && (test || griefing)) {
+                    this.world.getGameRules().getBoolean("mobGriefing");
+                    if (NecronWitherBoss.insidePillar(this)) {
+
+                        System.out.println("trying to break");
+                        final int witherTargetId = MathHelper.floor(this.locY);
+                        final int target = MathHelper.floor(this.locX);
+                        final int j1 = MathHelper.floor(this.locZ);
+                        boolean flag = false;
+                        for (int k1 = -10; k1 <= 6; ++k1) {
+                            for (int l1 = -10; l1 <= 6; ++l1) {
+                                for (int i2 = -1; i2 <= 9; ++i2) {
+                                    final int j2 = target + k1;
+                                    final int k2 = witherTargetId + i2;
+                                    final int l2 = j1 + l1;
+                                    final Block block = this.world.getType(j2, k2, l2);
+                                    if (block.getMaterial() == Material.CLAY)
+                                        continue;
+                                    if (block.getMaterial() != Material.AIR && block != Blocks.BEDROCK && block != Blocks.ENDER_PORTAL && block != Blocks.ENDER_PORTAL_FRAME && block != Blocks.COMMAND && NecronWitherBoss.insidePillar(new Location(this.world.getWorld(), j2, k2, l2))) {
+
+                                        if (!CraftEventFactory.callEntityChangeBlockEvent(this, j2, k2, l2, Blocks.AIR, 0).isCancelled()) {
+                                            flag = (this.world.setAir(j2, k2, l2, true) || flag);
+                                            this.boss.hitByPillar();
+                                        }
                                     }
+
                                 }
                             }
                         }
-                    }
-                    if (flag) {
-                        this.world.a(null, 1012, (int) this.locX, (int) this.locY, (int) this.locZ, 0);
+                        if (flag) {
+                            this.world.a(null, 1012, (int) this.locX, (int) this.locY, (int) this.locZ, 0);
+                        }
                     }
                 }
             }
